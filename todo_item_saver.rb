@@ -29,33 +29,33 @@ end
 
 describe TodoSaver do
   describe '#save' do
-    it 'creates the todo and adds it to a list' do
-      todo_list, todo = mock, mock
-      saver = TodoSaver.new('Writing', 'write blogpost')
-      saver.stub todo_list: todo_list
+    context 'the list to save it to exists' do
+      it 'creates the todo and adds it to a list' do
+        todo_list, todo = mock, mock
+        saver = TodoSaver.new('WriTing', 'write blogpost')
+        TodoList.stub(:retrieve).with('writing').and_return(todo_list)
 
-      TodoItem.should_receive(:create).with('write blogpost')
-              .and_return(todo)
-      todo_list.should_receive(:add).with(todo)
+        TodoItem.should_receive(:create).with('write blogpost')
+                .and_return(todo)
+        todo_list.should_receive(:add).with(todo)
 
-      saver.save()
+        saver.save()
+      end
     end
-  end
-  describe '#todo_list' do
-    it 'retrieves an existing list by its normalized name' do
-      todo_list = mock
-      saver = TodoSaver.new('WriTing', mock)
-      TodoList.stub(:retrieve).with('writing').and_return(todo_list)
+    context 'the list to save it does not exist' do
+      it 'creates the todo and adds it to a newly created list' do
+        todo_list, todo = mock, mock
+        saver = TodoSaver.new('WriTing', 'write blogpost')
+        saver.stub todo_list: todo_list
+        TodoList.stub(:retrieve).with('writing').and_return(nil)
+        TodoList.stub(:create).with('WriTing').and_return(todo_list)
 
-      expect(saver.todo_list).to eq todo_list
-    end
-    it 'creates a new list if no previous list was found' do
-      todo_list = mock
-      saver = TodoSaver.new('WriTing', mock)
-      TodoList.stub(:retrieve).with('writing').and_return(nil)
-      TodoList.stub(:create).with('WriTing').and_return(todo_list)
+        TodoItem.should_receive(:create).with('write blogpost')
+                .and_return(todo)
+        todo_list.should_receive(:add).with(todo)
 
-      expect(saver.todo_list).to eq todo_list
+        saver.save()
+      end
     end
   end
 end
