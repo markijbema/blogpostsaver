@@ -17,13 +17,24 @@ class TodoSaver
   end
 
   def save
-    todo = TodoItem.create(@todo_text)
     todo_list.add todo
   end
 
+  private
+  def todo
+    TodoItem.create(@todo_text)
+  end
+
   def todo_list
-    TodoList.retrieve(@list_name.downcase) ||
-      TodoList.create(@list_name)
+    existing_list or new_list
+  end
+
+  def existing_list
+    TodoList.retrieve(@list_name.downcase)
+  end
+
+  def new_list
+    TodoList.create(@list_name)
   end
 end
 
